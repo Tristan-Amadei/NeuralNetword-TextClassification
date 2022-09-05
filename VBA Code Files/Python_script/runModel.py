@@ -108,20 +108,13 @@ def get_class_predicted(categories):
 
 
 def row_is_empty(df, i):
-    if df.iloc[i]["contact_job_function_selfrep"] != "":
+    if df.iloc[i]["job_selfrep"] != "":
         return False
-    if df.iloc[i]["contact_job_role"] != "":
+    if df.iloc[i]["job_role"] != "":
         return False
-    if df.iloc[i]["contact_job_title"] != "":
+    if df.iloc[i]["job_title"] != "":
         return False
     return True
-
-def read_excel(path, sheet_name):     
-    buffer = StringIO()            
-    Xlsx2csv(path, outputencoding="utf-8").convert(buffer,sheetname=sheet_name)          
-    buffer.seek(0)    
-    df = pd.read_csv(buffer, low_memory=False)    
-    return df
 
 # # Write the function that will do everything
 
@@ -153,9 +146,9 @@ def classify_people_jobs(link_to_dataset, link_to_model, link_to_classes):
     indices_to_fill = []
     for i in tqdm(range(len(df))):
         if df.iloc[i]["contact_job_function"] == "" and not row_is_empty(df, i):
-            encode_roles = [encode_string(df.iloc[i]["contact_job_function_selfrep"])]
-            encode_roles += [encode_string(df.iloc[i]["contact_job_role"])]
-            encode_roles += [encode_string(df.iloc[i]["contact_job_title"])]
+            encode_roles = [encode_string(df.iloc[i]["job_selfrep"])]
+            encode_roles += [encode_string(df.iloc[i]["job_role"])]
+            encode_roles += [encode_string(df.iloc[i]["job_title"])]
             X.append(encode_roles)
             indices_to_fill.append(i)
             
@@ -174,7 +167,7 @@ def classify_people_jobs(link_to_dataset, link_to_model, link_to_classes):
         import warnings
         warnings.filterwarnings('ignore')
     
-        job_functions = np.array(df["contact_job_function"])
+        job_functions = np.array(df["function"])
         for i in range(len(X)):
             index = indices_to_fill[i]
             job_functions[index] = classes_predicted[i]
@@ -200,7 +193,7 @@ wb = xw.Book(link_to_dataset)
 sheet = wb.sheets['result']
 
 col_contact_job_function = 1
-while sheet.range((1, col_contact_job_function)).value != "contact_job_function" and sheet.range((1, col_contact_job_function)).value != "":
+while sheet.range((1, col_contact_job_function)).value != "function" and sheet.range((1, col_contact_job_function)).value != "":
     col_contact_job_function += 1
 
 
